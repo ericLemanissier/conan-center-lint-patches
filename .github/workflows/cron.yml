@@ -51,7 +51,7 @@ jobs:
             then
               continue
             fi
-            res=$(python3 ../../lint-patches.py ${conandata})
+            res=$(python3 ../../lint_patches.py ${conandata})
             if [[ -z "$res" ]]
             then
               continue
