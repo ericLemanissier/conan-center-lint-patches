@@ -16,6 +16,7 @@ def main(path: str) -> int:
         actual_patches.extend(
             os.path.join(root[len(patches_path) + 1:], f)
             for root, _, files in os.walk(patches_path) for f in files)
+    actual_patches.sort()
     unused_patches = copy.copy(actual_patches)
     for version in parsed.get("patches", []):
         patches = parsed["patches"][version]
