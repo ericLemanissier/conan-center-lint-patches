@@ -46,12 +46,7 @@ jobs:
           echo "" | tee -a $outfile $GITHUB_STEP_SUMMARY
           for d in */*/
           do
-            conandata=${d}conandata.yml            
-            if [[ ! -f "$conandata" ]]
-            then
-              continue
-            fi
-            res=$(python3 ../../lint_patches.py ${conandata})
+            res=$(python3 ../../lint_patches.py ${d})
             if [[ -z "$res" ]]
             then
               continue

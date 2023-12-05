@@ -1,16 +1,48 @@
+import ast
 import sys
 import copy
 import os
 from yaml import safe_load
 
 
-def main(path: str) -> int:
-    with open(path, encoding="utf-8") as file:
-        content = file.read()
+def check_if_patches_are_exported_and_applied(path: str):
+    conandata_path = os.path.join(path, "conandata.yml")
+    conanfile_path = os.path.join(path, "conanfile.py")
+    with open(conanfile_path, encoding='utf-8') as file:
+        recipe_lines = file.readlines()
+    source = "".join(recipe_lines)
 
-    parsed = safe_load(content)
+    tree = ast.parse(source)
 
-    patches_path = os.path.join(os.path.dirname(path), "patches")
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            func = node.func
+            if isinstance(func, ast.Name) and func.id == "apply_conandata_patches":
+                break
+            if isinstance(func, ast.Attribute):
+                if func.attr == "apply_conandata_patches":
+                    break
+                if isinstance(func.value, ast.Name) and func.value.id == "tools" and func.attr == "patch":
+                    break
+    else:
+        patches_are_exported = any(isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "export_conandata_patches" for node in ast.walk(tree))
+        if not patches_are_exported:
+            print(f"Patches are listed in [{conandata_path}](https://github.com/conan-io/conan-center-index/tree/master/recipes/{conandata_path})"
+                  f" but not exported in [{conanfile_path}](https://github.com/conan-io/conan-center-index/tree/master/recipes/{conanfile_path})\n")
+
+        print(f"Patches are listed in [{conandata_path}](https://github.com/conan-io/conan-center-index/tree/master/recipes/{conandata_path})"
+              f" but not applied in [{conanfile_path}](https://github.com/conan-io/conan-center-index/tree/master/recipes/{conanfile_path})\n")
+
+
+def main(path: str) -> int:  # noqa: MC0001
+    conandata_path = os.path.join(path, "conandata.yml")
+    if os.path.isfile(conandata_path):
+        with open(conandata_path, encoding="utf-8") as file:
+            parsed = safe_load(file.read())
+    else:
+        parsed = {}
+
+    patches_path = os.path.join(path, "patches")
     actual_patches: list[str] = []
     if os.path.isdir(patches_path):
         actual_patches.extend(
@@ -18,8 +50,7 @@ def main(path: str) -> int:
             for root, _, files in os.walk(patches_path) for f in files)
     actual_patches.sort()
     unused_patches = copy.copy(actual_patches)
-    for version in parsed.get("patches", []):
-        patches = parsed["patches"][version]
+    for version, patches in parsed.get("patches", {}).items():
         if version not in parsed["sources"]:
             print(
                 f"Patch(es) are listed for version `{version}`,"
@@ -38,8 +69,11 @@ def main(path: str) -> int:
                 if patch_file_name not in actual_patches:
                     print(f"The file `{patch_file_name}` does not exist in the [`patches` folder](https://github.com/conan-io/conan-center-index/tree/master/recipes/{patches_path})")
 
+    if any(parsed.get("patches", {})):
+        check_if_patches_are_exported_and_applied(path)
+
     if unused_patches:
-        print(f"Following patch files are not referenced in [{path}](https://github.com/conan-io/conan-center-index/tree/master/recipes/{path})")
+        print(f"Following patch files are not referenced in [{conandata_path}](https://github.com/conan-io/conan-center-index/tree/master/recipes/{conandata_path})")
         for patch in unused_patches:
             print(f"- [{patch}](https://github.com/conan-io/conan-center-index/tree/master/recipes/{patches_path}/{patch})")
         print("\n")
