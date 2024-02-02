@@ -63,6 +63,7 @@ def main(path: str) -> int:  # noqa: MC0001
             if not patch_file_name.startswith("patches/"):
                 print(f"patches should be located in [patches](https://github.com/conan-io/conan-center-index/tree/master/recipes/{patches_path}) subfolder, not in {patch_file_name}")
             else:
+                patch_file_name = os.path.relpath(patch_file_name)  # fixes the path (double slashes for example)
                 patch_file_name = patch_file_name[8:]
                 if patch_file_name in unused_patches:
                     unused_patches.remove(patch_file_name)
