@@ -1,3 +1,9 @@
+# /// script
+# dependencies = [
+#   "pyyaml==6.0.3",
+# ]
+# ///
+
 import ast
 import sys
 import copy
