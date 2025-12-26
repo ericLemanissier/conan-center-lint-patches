@@ -27,11 +27,11 @@ def check_if_patches_are_exported_and_applied(path: str):
     else:
         patches_are_exported = any(isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id == "export_conandata_patches" for node in ast.walk(tree))
         if not patches_are_exported:
-            print(f"Patches are listed in [{conandata_path}](https://github.com/ericLemanissier/cocorepo/tree/master/recipes/{conandata_path})"
-                  f" but not exported in [{conanfile_path}](https://github.com/ericLemanissier/cocorepo/tree/master/recipes/{conanfile_path})\n")
+            print(f"Patches are listed in [{conandata_path}](https://github.com/ericLemanissier/cocorepo/tree/HEAD/recipes/{conandata_path})"
+                  f" but not exported in [{conanfile_path}](https://github.com/ericLemanissier/cocorepo/tree/HEAD/recipes/{conanfile_path})\n")
 
-        print(f"Patches are listed in [{conandata_path}](https://github.com/ericLemanissier/cocorepo/tree/master/recipes/{conandata_path})"
-              f" but not applied in [{conanfile_path}](https://github.com/ericLemanissier/cocorepo/tree/master/recipes/{conanfile_path})\n")
+        print(f"Patches are listed in [{conandata_path}](https://github.com/ericLemanissier/cocorepo/tree/HEAD/recipes/{conandata_path})"
+              f" but not applied in [{conanfile_path}](https://github.com/ericLemanissier/cocorepo/tree/HEAD/recipes/{conanfile_path})\n")
 
 
 def main(path: str) -> int:  # noqa: MC0001  pylint: disable=too-many-branches
@@ -61,22 +61,22 @@ def main(path: str) -> int:  # noqa: MC0001  pylint: disable=too-many-branches
         for _, patch in enumerate(patches):
             patch_file_name = str(patch["patch_file"])
             if not patch_file_name.startswith("patches/"):
-                print(f"patches should be located in [patches](https://github.com/ericLemanissier/cocorepo/tree/master/recipes/{patches_path}) subfolder, not in {patch_file_name}")
+                print(f"patches should be located in [patches](https://github.com/ericLemanissier/cocorepo/tree/HEAD/recipes/{patches_path}) subfolder, not in {patch_file_name}")
             else:
                 patch_file_name = os.path.relpath(patch_file_name)  # fixes the path (double slashes for example)
                 patch_file_name = patch_file_name[8:]
                 if patch_file_name in unused_patches:
                     unused_patches.remove(patch_file_name)
                 if patch_file_name not in actual_patches:
-                    print(f"The file `{patch_file_name}` does not exist in the [`patches` folder](https://github.com/ericLemanissier/cocorepo/tree/master/recipes/{patches_path})")
+                    print(f"The file `{patch_file_name}` does not exist in the [`patches` folder](https://github.com/ericLemanissier/cocorepo/tree/HEAD/recipes/{patches_path})")
 
     if any(parsed.get("patches", {})):
         check_if_patches_are_exported_and_applied(path)
 
     if unused_patches:
-        print(f"Following patch files are not referenced in [{conandata_path}](https://github.com/ericLemanissier/cocorepo/tree/master/recipes/{conandata_path})")
+        print(f"Following patch files are not referenced in [{conandata_path}](https://github.com/ericLemanissier/cocorepo/tree/HEAD/recipes/{conandata_path})")
         for patch in unused_patches:
-            print(f"- [{patch}](https://github.com/ericLemanissier/cocorepo/tree/master/recipes/{patches_path}/{patch})")
+            print(f"- [{patch}](https://github.com/ericLemanissier/cocorepo/tree/HEAD/recipes/{patches_path}/{patch})")
         print("\n")
     return 0
 
