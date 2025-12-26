@@ -34,7 +34,7 @@ def check_if_patches_are_exported_and_applied(path: str):
               f" but not applied in [{conanfile_path}](https://github.com/ericLemanissier/cocorepo/tree/master/recipes/{conanfile_path})\n")
 
 
-def main(path: str) -> int:  # noqa: MC0001
+def main(path: str) -> int:  # noqa: MC0001  pylint: disable=too-many-branches
     conandata_path = os.path.join(path, "conandata.yml")
     if os.path.isfile(conandata_path):
         with open(conandata_path, encoding="utf-8") as file:
