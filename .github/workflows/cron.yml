@@ -78,7 +78,7 @@ jobs:
   Gather_Results:
     name: Gather results
     needs: [status]
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v7
         with:
