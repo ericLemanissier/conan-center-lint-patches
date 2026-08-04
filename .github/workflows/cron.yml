@@ -31,11 +31,11 @@ jobs:
           repository: ericLemanissier/cocorepo
           path: cocorepo
 
-      - uses: actions/setup-python@v7
-        with:
-          python-version: "3.14"
-
       - uses: astral-sh/setup-uv@v9.0.0
+        with:
+          activate-environment: true
+
+      - run: uv sync --locked --no-dev
 
       - name: Check patches
         run: |
@@ -45,7 +45,7 @@ jobs:
           echo "" | tee -a $outfile $GITHUB_STEP_SUMMARY
           for d in */*/
           do
-            res=$(uv run ../../lint_patches.py ${d})
+            res=$(uv run --no-dev ../../lint_patches.py ${d})
             if [[ -z "$res" ]]
             then
               continue

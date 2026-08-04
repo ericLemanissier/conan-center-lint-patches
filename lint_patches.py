@@ -1,20 +1,15 @@
-# /// script
-# dependencies = [
-#   "pyyaml==6.0.3",
-# ]
-# ///
-
 import ast
-import sys
 import copy
 import os
+import sys
+
 from yaml import safe_load
 
 
-def check_if_patches_are_exported_and_applied(path: str):
+def check_if_patches_are_exported_and_applied(path: str) -> None:
     conandata_path = os.path.join(path, "conandata.yml")
     conanfile_path = os.path.join(path, "conanfile.py")
-    with open(conanfile_path, encoding='utf-8') as file:
+    with open(conanfile_path, encoding="utf-8") as file:
         recipe_lines = file.readlines()
     source = "".join(recipe_lines)
 
@@ -40,7 +35,7 @@ def check_if_patches_are_exported_and_applied(path: str):
               f" but not applied in [{conanfile_path}](https://github.com/ericLemanissier/cocorepo/tree/HEAD/recipes/{conanfile_path})\n")
 
 
-def main(path: str) -> int:  # noqa: MC0001  pylint: disable=too-many-branches
+def main(path: str) -> int:
     conandata_path = os.path.join(path, "conandata.yml")
     if os.path.isfile(conandata_path):
         with open(conandata_path, encoding="utf-8") as file:
@@ -62,7 +57,7 @@ def main(path: str) -> int:  # noqa: MC0001  pylint: disable=too-many-branches
                 f"Patch(es) are listed for version `{version}`,"
                 f" but there is source for this version."
                 f" You should either remove `{version}` from the `patches` section,"
-                f" or add it to the `sources` section"
+                f" or add it to the `sources` section",
             )
         for _, patch in enumerate(patches):
             patch_file_name = str(patch["patch_file"])
